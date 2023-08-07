@@ -513,6 +513,7 @@ export enum ERC20BridgeSource {
     BaseSwap = 'BaseSwap',
     SwapBased = 'SwapBased',
     RocketSwap = 'RocketSwap',
+    SushiSwapV3 = 'SushiSwapV3',
 }
 
 // Internal `fillData` field for `Fill` objects.

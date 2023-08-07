@@ -1556,14 +1556,12 @@ export class SamplerOperations {
                     case ERC20BridgeSource.BaseSwap:
                     case ERC20BridgeSource.SwapBased:
                     case ERC20BridgeSource.RocketSwap:
+                    case ERC20BridgeSource.SushiSwapV3:
                     case ERC20BridgeSource.Yoshi:
                     case ERC20BridgeSource.MorpheusSwap:
                     case ERC20BridgeSource.BiSwap:
                     case ERC20BridgeSource.MDex:
                     case ERC20BridgeSource.KnightSwap:
-                    case ERC20BridgeSource.BaseSwap:
-                    case ERC20BridgeSource.SwapBased:
-                    case ERC20BridgeSource.RocketSwap:
                     case ERC20BridgeSource.MeshSwap: {
                         // Skip sampling when it involves a known rebasing token as it results in high revert rate.
                         // https://docs.uniswap.org/protocol/V2/reference/smart-contracts/common-errors#rebasing-tokens
@@ -1903,14 +1901,12 @@ export class SamplerOperations {
                     case ERC20BridgeSource.BaseSwap:
                     case ERC20BridgeSource.SwapBased:
                     case ERC20BridgeSource.RocketSwap:
+                    case ERC20BridgeSource.SushiSwapV3:
                     case ERC20BridgeSource.Yoshi:
                     case ERC20BridgeSource.MorpheusSwap:
                     case ERC20BridgeSource.BiSwap:
                     case ERC20BridgeSource.MDex:
                     case ERC20BridgeSource.KnightSwap:
-                    case ERC20BridgeSource.BaseSwap:
-                    case ERC20BridgeSource.SwapBased:
-                    case ERC20BridgeSource.RocketSwap:
                     case ERC20BridgeSource.MeshSwap: {
                         // Skip sampling when it involves a known rebasing token as it results in high revert rate.
                         // https://docs.uniswap.org/protocol/V2/reference/smart-contracts/common-errors#rebasing-tokens

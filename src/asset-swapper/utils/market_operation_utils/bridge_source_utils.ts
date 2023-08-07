@@ -46,8 +46,10 @@ import {
     WAULTSWAP_ROUTER_BY_CHAIN_ID,
     YOSHI_ROUTER_BY_CHAIN_ID,
     BASESWAP_ROUTER_BY_CHAIN_ID,
+    SUSHISWAPV3_ROUTER_BY_CHAIN_ID,
     SWAPBASED_ROUTER_BY_CHAIN_ID,
     ROCKETSWAP_ROUTER_BY_CHAIN_ID,
+
 } from './constants';
 import {
     ACRYPTOS_BSC_INFOS,
@@ -158,7 +160,7 @@ function getCurveInfosForPair(chainId: ChainId, takerToken: string, makerToken: 
 }
 
 function getCurveV2InfosForPair(chainId: ChainId, takerToken: string, makerToken: string): CurveInfo[] {
-    const filterTokenInfos = function(curveV2ChainInfos: { [name: string]: CurveInfo }): CurveInfo[] {
+    const filterTokenInfos = function (curveV2ChainInfos: { [name: string]: CurveInfo }): CurveInfo[] {
         return Object.values(curveV2ChainInfos).filter((c) =>
             [makerToken, takerToken].every(
                 (t) =>
@@ -485,6 +487,7 @@ export function uniswapV2LikeRouterAddress(
         | ERC20BridgeSource.UbeSwap
         | ERC20BridgeSource.MorpheusSwap
         | ERC20BridgeSource.BaseSwap
+        | ERC20BridgeSource.SushiSwapV3
         | ERC20BridgeSource.SwapBased
         | ERC20BridgeSource.RocketSwap
         | ERC20BridgeSource.SpookySwap
@@ -493,7 +496,7 @@ export function uniswapV2LikeRouterAddress(
         | ERC20BridgeSource.Yoshi
         | ERC20BridgeSource.MDex
         | ERC20BridgeSource.KnightSwap
-        | ERC20BridgeSource.MeshSwap,
+        | ERC20BridgeSource.MeshSwap
 ): string {
     switch (source) {
         case ERC20BridgeSource.UniswapV2:
@@ -528,6 +531,8 @@ export function uniswapV2LikeRouterAddress(
             return MORPHEUSSWAP_ROUTER_BY_CHAIN_ID[chainId];
         case ERC20BridgeSource.BaseSwap:
             return BASESWAP_ROUTER_BY_CHAIN_ID[chainId];
+        case ERC20BridgeSource.SushiSwapV3:
+            return SUSHISWAPV3_ROUTER_BY_CHAIN_ID[chainId]; 
         case ERC20BridgeSource.SwapBased:
             return SWAPBASED_ROUTER_BY_CHAIN_ID[chainId];
         case ERC20BridgeSource.RocketSwap:
