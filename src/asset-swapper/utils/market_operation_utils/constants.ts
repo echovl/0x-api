@@ -219,6 +219,7 @@ export const SELL_SOURCE_FILTER_BY_CHAIN_ID: Record<ChainId, SourceFilters> = {
         ERC20BridgeSource.BaseSwap,
         ERC20BridgeSource.SwapBased,
         ERC20BridgeSource.RocketSwap,
+        ERC20BridgeSource.SushiSwapV3,
     ]),
 };
 
@@ -377,6 +378,7 @@ export const BUY_SOURCE_FILTER_BY_CHAIN_ID: Record<ChainId, SourceFilters> = {
         ERC20BridgeSource.BaseSwap,
         ERC20BridgeSource.SwapBased,
         ERC20BridgeSource.RocketSwap,
+        ERC20BridgeSource.SushiSwapV3,
     ]),
 };
 
@@ -406,7 +408,7 @@ export const FEE_QUOTE_SOURCES_BY_CHAIN_ID = valueByChainId<ERC20BridgeSource[]>
         [ChainId.Celo]: [ERC20BridgeSource.UbeSwap, ERC20BridgeSource.SushiSwap],
         [ChainId.Optimism]: [ERC20BridgeSource.UniswapV3],
         [ChainId.Arbitrum]: [ERC20BridgeSource.UniswapV3, ERC20BridgeSource.SushiSwap],
-        [ChainId.Base]: [ERC20BridgeSource.BaseSwap],
+        [ChainId.Base]: [ERC20BridgeSource.BaseSwap, ERC20BridgeSource.SushiSwapV3],
     },
     [],
 );
@@ -1815,6 +1817,13 @@ export const BASESWAP_ROUTER_BY_CHAIN_ID = valueByChainId<string>(
     NULL_ADDRESS,
 );
 
+export const SUSHISWAPV3_ROUTER_BY_CHAIN_ID = valueByChainId<string>(
+    {
+        [ChainId.Base]: '0x0BE808376Ecb75a5CF9bB6D237d16cd37893d904',
+    },
+    NULL_ADDRESS,
+);
+
 export const SWAPBASED_ROUTER_BY_CHAIN_ID = valueByChainId<string>(
     {
         [ChainId.Base]: '0xaaa3b1f1bd7bcc97fd1917c18ade665c5d31f066',
@@ -2229,6 +2238,38 @@ export const DEFAULT_GAS_SCHEDULE: GasSchedule = {
     [ERC20BridgeSource.BaseSwap]: uniswapV2CloneGasSchedule,
     [ERC20BridgeSource.SwapBased]: uniswapV2CloneGasSchedule,
     [ERC20BridgeSource.RocketSwap]: uniswapV2CloneGasSchedule,
+    [ERC20BridgeSource.SushiSwapV3]: (fillData?: FillData) => {
+        const uniFillData = fillData as TickDEXMultiPathFillData | FinalTickDEXMultiPathFillData;
+        // NOTE: This base value was heuristically chosen by looking at how much it generally
+        // underestimated gas usage
+        const base = 34e3; // 34k base
+        let gas = base;
+        if (isFinalPathFillData(uniFillData)) {
+            gas += uniFillData.gasUsed;
+        } else {
+            // NOTE: We don't actually know which of the paths would be used in the router
+            // therefore we estimate using the median of gas usage returned from UniswapV3
+            // For the best case scenario (least amount of hops & ticks) this will
+            // overestimate the gas usage
+            const pathAmountsWithGasUsed = uniFillData.pathAmounts.filter((p) => p.gasUsed > 0);
+            const medianGasUsedForPath =
+                pathAmountsWithGasUsed[Math.floor(pathAmountsWithGasUsed.length / 2)]?.gasUsed ?? 0;
+            gas += medianGasUsedForPath;
+        }
+
+        // If we for some reason could not read `gasUsed` when sampling
+        // fall back to legacy gas estimation
+        if (gas === base) {
+            gas = 100e3;
+            const path = uniFillData.tokenAddressPath;
+            if (path.length > 2) {
+                gas += (path.length - 2) * 32e3; // +32k for each hop.
+            }
+        }
+
+        return gas;
+    },
+
 };
 
 const DEFAULT_FEE_SCHEDULE: FeeSchedule = Object.keys(DEFAULT_GAS_SCHEDULE).reduce((acc, key) => {
